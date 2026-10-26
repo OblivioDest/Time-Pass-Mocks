@@ -1,0 +1,2276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Time Pass Mock | Dual-Mode MCQ Portal</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            },
+            tealbrand: {
+              500: '#14b8a6',
+              600: '#0d9488',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    .dark ::-webkit-scrollbar-thumb { background: #475569; }
+    
+    @keyframes pulse-subtle {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+    .animate-pulse-subtle {
+      animation: pulse-subtle 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col font-sans transition-colors duration-200">
+
+  <!-- ================= TOP NAVIGATION ================= -->
+  <header class="bg-white/85 dark:bg-slate-900/90 backdrop-blur sticky top-0 z-40 border-b border-slate-200 dark:border-slate-800 transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <!-- Logo & Branding -->
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="navigate('dashboard')">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 via-indigo-600 to-teal-500 flex items-center justify-center text-white shadow-md shadow-brand-500/25">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center space-x-1.5">
+            <span class="text-xl font-extrabold bg-gradient-to-r from-brand-600 via-indigo-500 to-teal-500 bg-clip-text text-transparent">Time Pass Mock</span>
+            <span class="text-xs px-2 py-0.5 font-bold uppercase bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300 rounded-full">v2.0</span>
+          </div>
+          <p class="text-[10px] text-slate-500 dark:text-slate-400 font-medium -mt-0.5">MCQ Engine & Instant Study Lab</p>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="hidden md:flex items-center space-x-1" id="navDesktopTabs">
+        <button onclick="navigate('dashboard')" data-tab="dashboard" class="nav-tab px-3.5 py-2 rounded-xl text-sm font-semibold transition text-brand-600 bg-brand-50 dark:bg-indigo-950/60 dark:text-brand-300">
+          Dashboard
+        </button>
+        <button onclick="startNewMockCreation()" data-tab="creator" class="nav-tab px-3.5 py-2 rounded-xl text-sm font-medium transition text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white">
+          Create / Edit Mock
+        </button>
+        <button onclick="navigate('results')" data-tab="results" class="nav-tab px-3.5 py-2 rounded-xl text-sm font-medium transition text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white">
+          History & Analytics
+        </button>
+      </nav>
+
+      <!-- Actions & Toggles -->
+      <div class="flex items-center space-x-2 sm:space-x-3">
+        <!-- Audio chime toggle -->
+        <button id="soundToggleBtn" onclick="toggleSound()" class="p-2 rounded-xl text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 transition" title="Toggle Sound Feedback">
+          <svg id="soundOnIcon" class="w-5 h-5 text-teal-600 dark:text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg>
+          <svg id="soundOffIcon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"></path></svg>
+        </button>
+
+        <!-- Theme Toggle -->
+        <button onclick="toggleTheme()" class="p-2 rounded-xl text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 transition" title="Toggle Dark/Light Mode">
+          <svg id="themeIconSun" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+          <svg id="themeIconMoon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+        </button>
+
+        <button onclick="startNewMockCreation()" class="hidden sm:inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold shadow-sm transition active:scale-95">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+          <span>New Mock</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Notification Toast Container -->
+  <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+  <!-- ================= MAIN CONTAINER ================= -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+
+    <!-- VIEW 1: DASHBOARD -->
+    <section id="viewDashboard" class="space-y-6">
+      <!-- Hero Banner -->
+      <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-6 sm:p-8 border border-slate-800 shadow-xl">
+        <div class="relative z-10 max-w-2xl">
+          <div class="inline-flex items-center space-x-2 px-3 py-1 bg-white/10 backdrop-blur-md rounded-full text-xs font-semibold uppercase tracking-wider text-teal-300 mb-3 border border-white/10">
+            <span>⚡ Dual Mode Mock Platform</span>
+            <span>•</span>
+            <span>Speed Practice & Exams</span>
+          </div>
+          <h1 class="text-3xl sm:text-4xl font-black tracking-tight leading-tight">
+            Study, Quiz, or Simulate Real <span class="bg-gradient-to-r from-indigo-400 to-teal-300 bg-clip-text text-transparent">Competitive Exams</span>
+          </h1>
+          <p class="mt-2 text-slate-300 text-sm sm:text-base leading-relaxed">
+            Create custom question sets with in-depth study material and summary notes. Choose between <strong>Full Timed Simulation (e.g. 50 Qs in 30 Mins)</strong> or <strong>One-by-One Instant Feedback</strong> practice with live solutions.
+          </p>
+
+          <div class="mt-6 flex flex-wrap gap-3">
+            <button onclick="startNewMockCreation()" class="px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-semibold shadow-lg shadow-brand-500/30 transition active:scale-95 text-sm flex items-center space-x-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+              <span>Create Mock Test</span>
+            </button>
+            <button onclick="generateRapid50Blitz()" class="px-4 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-semibold shadow-md transition active:scale-95 text-sm flex items-center space-x-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+              <span>Auto-Gen 50-Q Blitz (30m)</span>
+            </button>
+            <label class="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-medium transition cursor-pointer text-sm flex items-center space-x-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+              <span>Import JSON</span>
+              <input type="file" id="jsonMockFileInput" accept=".json" class="hidden" onchange="handleImportJSON(event)">
+            </label>
+            <button onclick="resetToSampleTests()" class="px-3.5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-medium text-slate-300 transition">
+              Reset Samples
+            </button>
+          </div>
+        </div>
+        <div class="absolute -right-10 -bottom-10 w-72 h-72 bg-brand-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      </div>
+
+      <!-- Quick Metrics -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-sm">
+          <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider">Total Mocks</p>
+          <p class="text-2xl font-black text-slate-900 dark:text-white mt-1" id="statTotalMocks">0</p>
+        </div>
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-sm">
+          <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider">Available Questions</p>
+          <p class="text-2xl font-black text-slate-900 dark:text-white mt-1" id="statTotalQuestions">0</p>
+        </div>
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-sm">
+          <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider">Attempts Taken</p>
+          <p class="text-2xl font-black text-brand-600 dark:text-brand-400 mt-1" id="statAttemptsCount">0</p>
+        </div>
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-sm">
+          <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider">Avg Accuracy</p>
+          <p class="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1" id="statAvgAccuracy">0%</p>
+        </div>
+      </div>
+
+      <!-- Search & Filters -->
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
+        <div class="relative w-full sm:w-80">
+          <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+          </span>
+          <input type="text" id="dashboardSearchInput" oninput="renderMockCards()" placeholder="Search test name or category..." class="w-full pl-10 pr-4 py-2 text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500">
+        </div>
+        <div class="flex items-center space-x-2 w-full sm:w-auto">
+          <select id="dashboardCategoryFilter" onchange="renderMockCards()" class="px-3.5 py-2 text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500">
+            <option value="ALL">All Categories</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Mock Cards Grid -->
+      <div id="mockCardsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <!-- Injected via JavaScript -->
+      </div>
+
+      <!-- Empty State -->
+      <div id="noMocksState" class="hidden text-center py-16 px-4 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl">
+        <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path></svg>
+        </div>
+        <h3 class="text-lg font-bold text-slate-800 dark:text-slate-200">No mock tests found</h3>
+        <p class="text-slate-500 dark:text-slate-400 text-sm max-w-sm mx-auto mt-1">Get started by building a test or clicking Auto-Gen 50-Q Blitz.</p>
+        <button onclick="startNewMockCreation()" class="mt-4 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-semibold transition shadow">Create New Mock</button>
+      </div>
+    </section>
+
+    <!-- VIEW 2: MOCK CREATOR & QUESTION BUILDER -->
+    <section id="viewCreator" class="hidden space-y-6">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
+        <div>
+          <button onclick="navigate('dashboard')" class="text-xs font-semibold text-brand-600 dark:text-brand-400 hover:underline flex items-center space-x-1 mb-1">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+            <span>Back to Dashboard</span>
+          </button>
+          <h2 class="text-2xl font-black" id="creatorHeading">Create Mock Test</h2>
+        </div>
+        <div class="flex items-center space-x-2">
+          <button onclick="populatePresetFiftyQuestions()" class="px-3.5 py-2 rounded-xl bg-teal-50 dark:bg-teal-950/60 border border-teal-300 dark:border-teal-800 text-teal-700 dark:text-teal-300 text-xs font-semibold hover:bg-teal-100 transition" title="Fill test up to 50 questions with 30m duration">
+            + Auto 50-Questions (30m)
+          </button>
+          <button onclick="saveActiveMock()" class="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold shadow-md transition active:scale-95 flex items-center space-x-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            <span>Save Mock</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Test Meta Information -->
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 shadow-sm space-y-4">
+        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-500 border-b border-slate-100 dark:border-slate-800 pb-2">1. Test Settings & Marking Scheme</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Mock Title / Exam Name *</label>
+            <input type="text" id="metaTitle" placeholder="e.g. 50-Q Speed Blitz: General Studies & Polity" class="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Category / Tag</label>
+            <input type="text" id="metaCategory" placeholder="e.g. Polity, GS, SSC, Banking" class="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Duration for Full Exam (Mins)</label>
+            <input type="number" id="metaDuration" min="1" max="300" value="30" class="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Positive Marks (+)</label>
+            <input type="number" id="metaPositive" step="0.25" min="0" value="1.0" class="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Negative Marking Penalty (-)</label>
+            <input type="number" id="metaNegative" step="0.05" min="0" value="0.25" class="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Instructions / Description</label>
+            <input type="text" id="metaDescription" placeholder="Optional notes for candidates before taking the test..." class="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+          </div>
+        </div>
+      </div>
+
+      <!-- Questions List & Builder -->
+      <div class="space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-lg font-bold">Questions (<span id="creatorQuestionCount">0</span>)</h3>
+            <p class="text-xs text-slate-500">Add questions, radio correct answers, and attach custom study notes & formulas.</p>
+          </div>
+          <button onclick="addQuestionTemplate()" class="px-3.5 py-2 bg-indigo-50 dark:bg-indigo-950/70 hover:bg-indigo-100 border border-brand-200 dark:border-brand-800 text-brand-600 dark:text-brand-300 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center space-x-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+            <span>Add Question</span>
+          </button>
+        </div>
+
+        <div id="creatorQuestionsList" class="space-y-4">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Save Action -->
+      <div class="flex justify-end space-x-3 pt-4 border-t border-slate-200 dark:border-slate-800">
+        <button onclick="saveActiveMock()" class="px-6 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-semibold text-sm shadow transition">
+          Save Test & Return
+        </button>
+      </div>
+    </section>
+
+    <!-- VIEW 3A: FULL EXAM SIMULATOR (TIMED 30-MIN / 50-Q) -->
+    <section id="viewExamFull" class="hidden">
+      <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden flex flex-col min-h-[82vh]">
+        <!-- Exam Top Header -->
+        <div class="bg-slate-900 text-white px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-3 border-b border-slate-800">
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="px-2 py-0.5 rounded bg-brand-600 text-[11px] font-bold uppercase tracking-wider">Full Timed Exam</span>
+              <h2 class="text-base sm:text-lg font-bold truncate max-w-xs sm:max-w-md" id="examPortalTitle">Mock Test</h2>
+            </div>
+            <div class="flex items-center space-x-3 text-xs text-slate-400 mt-1">
+              <span id="examPortalCategory" class="text-slate-300 font-medium">Category</span>
+              <span>+<span id="examPortalPos">1</span> / -<span id="examPortalNeg">0.25</span></span>
+            </div>
+          </div>
+
+          <!-- Timer & Submit -->
+          <div class="flex items-center space-x-4">
+            <div id="examTimerBadge" class="flex items-center space-x-2 bg-slate-950 border border-slate-800 px-3.5 py-1.5 rounded-xl shadow-inner text-amber-300 font-mono font-bold text-base sm:text-lg">
+              <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              <span id="examTimerDisplay">00:30:00</span>
+            </div>
+            <button onclick="openSubmitConfirmModal()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs sm:text-sm rounded-xl transition shadow active:scale-95">
+              Submit Test
+            </button>
+          </div>
+        </div>
+
+        <!-- Section Bar -->
+        <div id="examSectionNavBar" class="bg-slate-100 dark:bg-slate-800/60 px-4 sm:px-6 py-2 border-b border-slate-200 dark:border-slate-800 flex items-center space-x-2 overflow-x-auto text-xs font-medium">
+          <!-- Dynamic Sections -->
+        </div>
+
+        <!-- Exam Workspace -->
+        <div class="flex-1 flex flex-col lg:flex-row">
+          <!-- Left: Question & Options -->
+          <div class="flex-1 p-5 sm:p-7 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-slate-200 dark:border-slate-800">
+            <div>
+              <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800 text-xs">
+                <span class="font-bold text-sm text-brand-600 dark:text-brand-400">Question <span id="currentQNum">1</span> of <span id="totalQNum">50</span></span>
+                <div class="space-x-3 text-slate-500 dark:text-slate-400 font-medium">
+                  <span>Marks: <span class="text-emerald-600 dark:text-emerald-400 font-semibold" id="currentQMarks">+1</span></span>
+                  <span>Negative: <span class="text-red-500 font-semibold" id="currentQNeg">-0.25</span></span>
+                </div>
+              </div>
+
+              <!-- Question text -->
+              <div class="mt-4 text-base sm:text-lg font-medium leading-relaxed" id="currentQText">
+                Loading question...
+              </div>
+
+              <!-- Options -->
+              <div class="mt-6 space-y-3" id="currentQOptionsContainer">
+                <!-- Radio options -->
+              </div>
+            </div>
+
+            <!-- Bottom Nav -->
+            <div class="pt-6 mt-8 border-t border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2.5">
+              <div class="flex items-center space-x-2">
+                <button onclick="handleMarkForReview()" class="px-4 py-2 bg-purple-50 dark:bg-purple-950/50 hover:bg-purple-100 dark:hover:bg-purple-900 border border-purple-300 dark:border-purple-700 text-purple-700 dark:text-purple-300 text-xs sm:text-sm font-semibold rounded-xl transition">
+                  Mark for Review & Next
+                </button>
+                <button onclick="handleClearResponse()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs sm:text-sm font-medium rounded-xl transition">
+                  Clear Response
+                </button>
+              </div>
+
+              <div class="flex items-center space-x-2">
+                <button onclick="handlePreviousQuestion()" class="px-4 py-2 border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs sm:text-sm font-medium rounded-xl transition">
+                  Previous
+                </button>
+                <button onclick="handleSaveAndNext()" class="px-5 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs sm:text-sm font-semibold rounded-xl transition shadow active:scale-95 flex items-center space-x-1">
+                  <span>Save & Next</span>
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Candidate Palette (NTA Standard) -->
+          <div class="w-full lg:w-80 bg-slate-50 dark:bg-slate-900/40 p-4 sm:p-5 flex flex-col justify-between">
+            <div>
+              <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Question Status</h4>
+              <div class="grid grid-cols-2 gap-2 text-[11px] mb-4">
+                <div class="flex items-center space-x-2">
+                  <span class="w-5 h-5 rounded flex items-center justify-center font-bold text-white bg-green-500">A</span>
+                  <span class="text-slate-600 dark:text-slate-400">Answered (<span id="legendCountAnswered">0</span>)</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <span class="w-5 h-5 rounded flex items-center justify-center font-bold text-white bg-red-500">NA</span>
+                  <span class="text-slate-600 dark:text-slate-400">Not Answered (<span id="legendCountNotAnswered">0</span>)</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <span class="w-5 h-5 rounded flex items-center justify-center font-bold text-white bg-purple-500">MR</span>
+                  <span class="text-slate-600 dark:text-slate-400">Marked (<span id="legendCountMarked">0</span>)</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <span class="w-5 h-5 rounded flex items-center justify-center font-bold text-slate-700 dark:text-slate-200 bg-slate-200 dark:bg-slate-700">NV</span>
+                  <span class="text-slate-600 dark:text-slate-400">Not Visited (<span id="legendCountNotVisited">0</span>)</span>
+                </div>
+              </div>
+
+              <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Palette</h4>
+              <div id="questionPaletteGrid" class="grid grid-cols-5 gap-2 max-h-64 sm:max-h-80 overflow-y-auto pr-1 py-1">
+                <!-- Dynamically rendered -->
+              </div>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800">
+              <button onclick="openSubmitConfirmModal()" class="w-full py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-semibold text-sm shadow transition">
+                Summary & Final Submit
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 3B: ONE-BY-ONE INSTANT PRACTICE MODE -->
+    <section id="viewExamOneByOne" class="hidden space-y-6">
+      <!-- Practice Header Bar -->
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-5 shadow-sm flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-2xl bg-teal-50 dark:bg-teal-950/70 text-teal-600 dark:text-teal-400 flex items-center justify-center font-black">
+            ⚡
+          </div>
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="px-2 py-0.5 rounded-full bg-teal-100 dark:bg-teal-950 text-teal-700 dark:text-teal-300 text-[10px] font-bold uppercase">Instant Practice Mode</span>
+              <h2 class="text-base sm:text-lg font-bold" id="oboMockTitle">Practice Mock</h2>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Attempt question & instantly get feedback, score, and study material summary.</p>
+          </div>
+        </div>
+
+        <!-- Real-time Score & Streak Pills -->
+        <div class="flex items-center space-x-3">
+          <div class="px-3.5 py-1.5 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-900/60 flex items-center space-x-1.5 text-xs font-bold text-amber-700 dark:text-amber-300">
+            <span>🔥 Streak:</span>
+            <span id="oboStreakCount" class="font-mono text-sm">0</span>
+          </div>
+          <div class="px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200">
+            Score: <span id="oboScoreDisplay" class="font-mono text-emerald-600 dark:text-emerald-400 font-bold">0.00</span>
+          </div>
+          <button onclick="finishOneByOneSession()" class="px-4 py-1.5 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-xs font-semibold text-slate-700 dark:text-slate-300 transition">
+            Exit Practice
+          </button>
+        </div>
+      </div>
+
+      <!-- Main One-by-One Question Card -->
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-md space-y-6">
+        <!-- Question Meta & Section -->
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 text-xs">
+          <div class="flex items-center space-x-2">
+            <span class="font-bold text-sm text-brand-600 dark:text-brand-400">Question <span id="oboCurrentQNum">1</span> of <span id="oboTotalQNum">50</span></span>
+            <span id="oboSectionTag" class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-medium">General</span>
+          </div>
+          <div class="text-xs text-slate-400">
+            Marking: +<span id="oboPosMark">1</span> / -<span id="oboNegMark">0.25</span>
+          </div>
+        </div>
+
+        <!-- Question Prompt -->
+        <div class="text-lg sm:text-xl font-medium leading-relaxed" id="oboQuestionText">
+          Loading Question...
+        </div>
+
+        <!-- Options Container (Interactive) -->
+        <div class="space-y-3" id="oboOptionsContainer">
+          <!-- Interactive cards with check logic -->
+        </div>
+
+        <!-- Instant Feedback Result Banner -->
+        <div id="oboFeedbackBanner" class="hidden p-4 rounded-2xl border text-sm font-semibold flex items-center justify-between">
+          <div class="flex items-center space-x-2" id="oboFeedbackText">
+            <!-- Injected -->
+          </div>
+          <span class="text-xs font-mono font-bold" id="oboFeedbackDelta"></span>
+        </div>
+
+        <!-- Study Material & Key Concept Summary Box -->
+        <div id="oboStudySummaryBox" class="p-5 rounded-2xl bg-gradient-to-r from-teal-50/70 to-indigo-50/70 dark:from-slate-800/80 dark:to-indigo-950/40 border border-teal-200 dark:border-slate-700 space-y-3">
+          <div class="flex items-center justify-between">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-teal-800 dark:text-teal-300 flex items-center space-x-1.5">
+              <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+              <span>Study Material & Key Summary</span>
+            </h4>
+            <button onclick="toggleEditStudyNotes()" class="text-[11px] font-semibold text-brand-600 dark:text-brand-400 hover:underline">
+              ✏️ Quick Edit Material
+            </button>
+          </div>
+
+          <div id="oboStudySummaryContent" class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-normal whitespace-pre-line">
+            <!-- Injected notes -->
+          </div>
+
+          <!-- Inline Edit Area (Hidden by default) -->
+          <div id="oboEditNotesDrawer" class="hidden pt-2 border-t border-teal-200 dark:border-slate-700 space-y-2">
+            <textarea id="oboLiveStudyNotesInput" rows="3" class="w-full p-2.5 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500" placeholder="Add formulas, key facts, mnemonics, or revision context..."></textarea>
+            <div class="flex justify-end space-x-2">
+              <button onclick="toggleEditStudyNotes()" class="px-3 py-1 text-xs rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800">Cancel</button>
+              <button onclick="saveLiveStudyNotes()" class="px-3.5 py-1 text-xs font-semibold rounded-lg bg-teal-600 hover:bg-teal-700 text-white shadow-sm">Save Note</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigation & Next Buttons -->
+        <div class="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800">
+          <button onclick="oboPreviousQuestion()" id="oboPrevBtn" class="px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+            Previous
+          </button>
+          
+          <div class="flex items-center space-x-2">
+            <button onclick="oboNextQuestion()" class="px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold rounded-xl shadow-md transition active:scale-95 flex items-center space-x-1.5">
+              <span>Next Question</span>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 4: RESULTS & SCORECARD -->
+    <section id="viewResults" class="hidden space-y-6">
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-6">
+          <div>
+            <span class="px-3 py-1 text-xs font-bold uppercase bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 rounded-full" id="resModeBadge">Exam Completed</span>
+            <h2 class="text-2xl sm:text-3xl font-black mt-2" id="resExamTitle">Mock Test Result</h2>
+            <p class="text-xs text-slate-500 mt-1" id="resExamDate">Attempted</p>
+          </div>
+          <div class="flex items-center space-x-3">
+            <button onclick="retakeCurrentTestPrompt()" class="px-4 py-2 rounded-xl bg-brand-50 dark:bg-indigo-950/60 hover:bg-brand-100 border border-brand-200 dark:border-brand-800 text-brand-600 dark:text-brand-300 font-semibold text-sm transition">
+              Retake Mock
+            </button>
+            <button onclick="navigate('dashboard')" class="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-semibold text-sm transition shadow">
+              Back to Dashboard
+            </button>
+          </div>
+        </div>
+
+        <!-- Metric highlights -->
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-4 mt-6">
+          <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-200 dark:border-slate-800">
+            <p class="text-xs text-slate-500 font-semibold uppercase">Score</p>
+            <p class="text-3xl font-black text-brand-600 dark:text-brand-400 mt-1" id="resTotalScore">0.00</p>
+            <p class="text-[11px] text-slate-400 mt-0.5">out of <span id="resMaxScore">0</span></p>
+          </div>
+          <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-200 dark:border-slate-800">
+            <p class="text-xs text-slate-500 font-semibold uppercase">Accuracy</p>
+            <p class="text-3xl font-black text-emerald-500 mt-1" id="resAccuracy">0%</p>
+            <p class="text-[11px] text-slate-400 mt-0.5"><span id="resCorrectCount">0</span> correct</p>
+          </div>
+          <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-200 dark:border-slate-800">
+            <p class="text-xs text-slate-500 font-semibold uppercase">Incorrect</p>
+            <p class="text-3xl font-black text-red-500 mt-1" id="resIncorrectCount">0</p>
+            <p class="text-[11px] text-slate-400 mt-0.5">Penalized</p>
+          </div>
+          <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-200 dark:border-slate-800">
+            <p class="text-xs text-slate-500 font-semibold uppercase">Attempted</p>
+            <p class="text-3xl font-black text-slate-800 dark:text-white mt-1" id="resAttemptedCount">0</p>
+            <p class="text-[11px] text-slate-400 mt-0.5"><span id="resUnattemptedCount">0</span> skipped</p>
+          </div>
+          <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 col-span-2 sm:col-span-1">
+            <p class="text-xs text-slate-500 font-semibold uppercase">Time Spent</p>
+            <p class="text-3xl font-black text-amber-500 mt-1" id="resTimeSpent">00:00</p>
+            <p class="text-[11px] text-slate-400 mt-0.5">Duration</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Solutions Review & Study Material Notes -->
+      <div class="space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h3 class="text-xl font-bold">Solutions & Detailed Summaries</h3>
+            <p class="text-xs text-slate-500">Includes answers, full explanations, and attached reference materials.</p>
+          </div>
+
+          <div class="flex items-center space-x-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-1 rounded-xl text-xs font-semibold">
+            <button onclick="filterReviewQuestions('ALL')" id="filterBtnAll" class="px-3 py-1.5 rounded-lg bg-brand-600 text-white">All</button>
+            <button onclick="filterReviewQuestions('CORRECT')" id="filterBtnCorrect" class="px-3 py-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">Correct</button>
+            <button onclick="filterReviewQuestions('INCORRECT')" id="filterBtnIncorrect" class="px-3 py-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">Incorrect</button>
+            <button onclick="filterReviewQuestions('UNATTEMPTED')" id="filterBtnUnattempted" class="px-3 py-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">Skipped</button>
+          </div>
+        </div>
+
+        <div id="resultsReviewContainer" class="space-y-4">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Past History -->
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm mt-8">
+        <h3 class="text-lg font-bold mb-4">Past Test History</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm">
+            <thead class="text-xs uppercase bg-slate-50 dark:bg-slate-800 text-slate-500 font-semibold border-b border-slate-200 dark:border-slate-700">
+              <tr>
+                <th class="py-3 px-4">Test Name</th>
+                <th class="py-3 px-4">Mode</th>
+                <th class="py-3 px-4">Date</th>
+                <th class="py-3 px-4">Score</th>
+                <th class="py-3 px-4">Accuracy</th>
+                <th class="py-3 px-4 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody id="attemptsHistoryTableBody" class="divide-y divide-slate-100 dark:divide-slate-800">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= MODE SELECTOR MODAL ================= -->
+  <div id="modeSelectModal" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 max-w-lg w-full p-6 shadow-2xl space-y-5 transform transition-all">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-2.5">
+          <div class="w-9 h-9 rounded-xl bg-brand-100 dark:bg-brand-950 text-brand-600 dark:text-brand-300 flex items-center justify-center font-bold">
+            🚀
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white">Choose Attempt Mode</h3>
+            <p class="text-xs text-slate-500" id="modeModalMockTitle">Selected Mock</p>
+          </div>
+        </div>
+        <button onclick="closeModeModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white p-1">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <!-- Mode 1: Full Exam -->
+        <div onclick="launchExamMode('FULL')" class="p-4 rounded-2xl border-2 border-brand-200 hover:border-brand-600 bg-brand-50/50 dark:bg-indigo-950/30 dark:border-indigo-900 cursor-pointer hover:shadow-md transition space-y-2 group">
+          <div class="flex items-center justify-between">
+            <span class="w-8 h-8 rounded-lg bg-brand-600 text-white flex items-center justify-center text-sm font-bold">1</span>
+            <span class="text-[11px] font-bold uppercase text-brand-600 dark:text-brand-400">Timed Exam</span>
+          </div>
+          <h4 class="font-bold text-slate-900 dark:text-white group-hover:text-brand-600 transition">Full Timed Exam</h4>
+          <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+            Standard examination with live timer (e.g. 50 Qs in 30 mins), NTA candidate palette, mark for review, and post-submission analytics.
+          </p>
+        </div>
+
+        <!-- Mode 2: One-by-One -->
+        <div onclick="launchExamMode('ONE_BY_ONE')" class="p-4 rounded-2xl border-2 border-teal-200 hover:border-teal-500 bg-teal-50/50 dark:bg-teal-950/30 dark:border-teal-900 cursor-pointer hover:shadow-md transition space-y-2 group">
+          <div class="flex items-center justify-between">
+            <span class="w-8 h-8 rounded-lg bg-teal-600 text-white flex items-center justify-center text-sm font-bold">2</span>
+            <span class="text-[11px] font-bold uppercase text-teal-600 dark:text-teal-400">Flash Feedback</span>
+          </div>
+          <h4 class="font-bold text-slate-900 dark:text-white group-hover:text-teal-600 transition">One-by-One Practice</h4>
+          <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+            Answer each question and instantly see if you are Right or Wrong! Includes immediate summary material and key formulas below.
+          </p>
+        </div>
+      </div>
+
+      <div class="text-center pt-1">
+        <p class="text-xs text-slate-400">You can also edit questions, add formulas, or export tests anytime from the dashboard.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= SUBMIT CONFIRM MODAL ================= -->
+  <div id="submitConfirmModal" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 max-w-md w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center space-x-3 text-amber-500">
+        <div class="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-950/60 flex items-center justify-center">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+        </div>
+        <h3 class="text-lg font-bold text-slate-900 dark:text-white">Submit Exam?</h3>
+      </div>
+      
+      <p class="text-sm text-slate-600 dark:text-slate-300">
+        Review your attempt summary before concluding:
+      </p>
+
+      <div class="bg-slate-50 dark:bg-slate-800/60 rounded-2xl p-4 space-y-2 text-xs font-semibold">
+        <div class="flex justify-between">
+          <span class="text-slate-500">Total Questions:</span>
+          <span class="font-bold" id="modalSummaryTotal">0</span>
+        </div>
+        <div class="flex justify-between text-green-600 dark:text-green-400">
+          <span>Answered:</span>
+          <span class="font-bold" id="modalSummaryAnswered">0</span>
+        </div>
+        <div class="flex justify-between text-purple-600 dark:text-purple-400">
+          <span>Marked for Review:</span>
+          <span class="font-bold" id="modalSummaryMarked">0</span>
+        </div>
+        <div class="flex justify-between text-red-500">
+          <span>Not Answered:</span>
+          <span class="font-bold" id="modalSummaryUnanswered">0</span>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end space-x-3 pt-2">
+        <button onclick="closeSubmitConfirmModal()" class="px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-sm font-semibold transition">
+          Resume Test
+        </button>
+        <button onclick="finalizeAndSubmitExam()" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold shadow transition">
+          Confirm Submit
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= JAVASCRIPT APPLICATION LOGIC ================= -->
+  <script>
+    /* -------------------------------------------------------------
+       STATE MANAGEMENT & LOCAL STORAGE
+    ------------------------------------------------------------- */
+    const STORAGE_KEY_MOCKS = 'timepass_mocks_v2';
+    const STORAGE_KEY_ATTEMPTS = 'timepass_attempts_v2';
+    const STORAGE_KEY_THEME = 'timepass_theme';
+    const STORAGE_KEY_SOUND = 'timepass_sound';
+
+    let mocks = [];
+    let attempts = [];
+    let activeEditingMock = null;
+    let selectedMockForLaunch = null;
+    let soundEnabled = true;
+
+    // Mode A: Full Exam state
+    let activeExam = null;
+    let examTimerInterval = null;
+    let examTimeElapsed = 0;
+
+    // Mode B: One-by-One state
+    let activeObo = null;
+
+    // Results state
+    let activeResultAttempt = null;
+    let currentReviewFilter = 'ALL';
+
+    /* -------------------------------------------------------------
+       SAMPLE DATA GENERATOR (Including 50-Q Blitz)
+    ------------------------------------------------------------- */
+    function generateRapid50QuestionSet() {
+      const topics = [
+        { sec: 'Indian Polity', concept: 'Fundamental Rights & Writs', note: 'Article 32 gives right to approach Supreme Court for writ remedies: Habeas Corpus, Mandamus, Prohibition, Quo-Warranto, Certiorari.' },
+        { sec: 'Quantitative Aptitude', concept: 'Speed, Distance & Time Formulas', note: 'Speed = Distance / Time. To convert km/h to m/s, multiply by 5/18. When two objects move towards each other, relative speed = S1 + S2.' },
+        { sec: 'Reasoning Ability', concept: 'Syllogism & Coding-Decoding', note: 'Reverse alphabet pairing rule: A-Z (1-26), B-Y (2-25), C-X, M-N. Sum of opposite letters is always 27.' },
+        { sec: 'General Science', concept: 'Physics & Optics Essentials', note: 'Concave mirrors produce real and inverted images except when object is placed between Focus and Pole (virtual & magnified).' },
+        { sec: 'Economics & Banking', concept: 'Monetary Policy Indicators', note: 'Repo Rate is rate at which RBI lends short-term money to commercial banks against government securities.' }
+      ];
+
+      const questions = [];
+      for (let i = 1; i <= 50; i++) {
+        const topic = topics[(i - 1) % topics.length];
+        questions.push({
+          id: `q_blitz_${i}`,
+          section: topic.sec,
+          text: `[Q.${i}] In ${topic.sec}, which principle or rule is critically evaluated regarding ${topic.concept.toLowerCase()}?`,
+          options: [
+            `Standard Principle Option A (${i * 2 + 10}%)`,
+            `Key Correct Concept under ${topic.concept}`,
+            `Contradictory Hypothesis Option C`,
+            `None of the above conditions apply`
+          ],
+          correctOptionIndex: 1,
+          explanation: `Option B is right: Under ${topic.sec}, the standard doctrine specifically adheres to ${topic.concept}.`,
+          studySummary: `📌 Summary & Key Reference Material:\n• Topic: ${topic.sec}\n• Core Concept: ${topic.concept}\n• Reference Notes: ${topic.note}\n• Revision Tip: Memorize the direct formulas before attempting timed section tests.`
+        });
+      }
+      return questions;
+    }
+
+    const DEFAULT_MOCKS = [
+      {
+        id: 'mock_timepass_50',
+        title: '50-Questions Speed Blitz Mock (30 Minutes)',
+        category: 'Combined GS & Aptitude',
+        duration: 30,
+        positiveMarks: 1.0,
+        negativePenalty: 0.25,
+        description: 'Complete 50-question mock built for 30-minute high-speed practice with detailed study summaries.',
+        updatedAt: new Date().toISOString(),
+        questions: generateRapid50QuestionSet()
+      },
+      {
+        id: 'mock_polity_constitution',
+        title: 'Indian Polity & Constitutional Articles Booster',
+        category: 'Indian Polity',
+        duration: 15,
+        positiveMarks: 2.0,
+        negativePenalty: 0.5,
+        description: 'Covers Articles, Amendments, Writs, and DPSP with dedicated reference notes for revision.',
+        updatedAt: new Date().toISOString(),
+        questions: [
+          {
+            id: 'pol_1',
+            section: 'Constitutional Law',
+            text: 'Which Article of the Constitution empowers the Supreme Court to issue Writs for enforcement of Fundamental Rights?',
+            options: ['Article 32', 'Article 226', 'Article 14', 'Article 131'],
+            correctOptionIndex: 0,
+            explanation: 'Article 32 provides the right to constitutional remedies via 5 writs directly to the Supreme Court. Article 226 provides writ powers to High Courts.',
+            studySummary: '📌 Constitutional Summary:\n• Article 32: Heart and Soul (Dr. Ambedkar).\n• 5 Types of Writs: Habeas Corpus (to have the body), Mandamus (we command), Prohibition, Certiorari, Quo-Warranto.\n• Fundamental Rights are justiciable under Part III.'
+          },
+          {
+            id: 'pol_2',
+            section: 'DPSP & Duties',
+            text: 'Under which Amendment were Fundamental Duties added to the Indian Constitution following Swaran Singh Committee recommendations?',
+            options: ['44th Amendment Act (1978)', '42nd Amendment Act (1976)', '86th Amendment Act (2002)', '52nd Amendment Act (1985)'],
+            correctOptionIndex: 1,
+            explanation: 'The 42nd Amendment Act (1976) introduced Part IV-A and Article 51A containing 10 Fundamental Duties. The 11th duty was added by the 86th Amendment.',
+            studySummary: '📌 Key Notes & Summary:\n• Committee: Sardar Swaran Singh Committee (1976).\n• Borrowed from: USSR Constitution.\n• Article 51A: Initially 10 duties, increased to 11 in 2002 (Right to Education 6-14 years).'
+          },
+          {
+            id: 'pol_3',
+            section: 'Parliament',
+            text: 'What constitutes the minimum quorum required to hold a meeting of either House of Parliament in India?',
+            options: ['One-third of total members', 'One-tenth (10%) of total members', '50 members regardless of size', 'One-fifth of total members'],
+            correctOptionIndex: 1,
+            explanation: 'According to Article 100(3), the quorum to constitute a meeting of either House of Parliament is one-tenth of the total number of members of the House.',
+            studySummary: '📌 Parliamentary Facts Summary:\n• Article 100(3): Quorum = 1/10th of total membership.\n• For Lok Sabha: 55 members minimum.\n• For Rajya Sabha: 25 members minimum.\n• If no quorum, presiding officer must adjourn or suspend the meeting.'
+          }
+        ]
+      }
+    ];
+
+    /* -------------------------------------------------------------
+       AUDIO SYNTHESIZER (WEB AUDIO API - NO EXTERNAL ASSETS)
+    ------------------------------------------------------------- */
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playTone(type) {
+      if (!soundEnabled) return;
+      try {
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        const now = audioCtx.currentTime;
+
+        if (type === 'correct') {
+          // Cheerful chime (E5 -> G#5 -> B5)
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(659.25, now);
+          osc.frequency.exponentialRampToValueAtTime(830.61, now + 0.1);
+          osc.frequency.exponentialRampToValueAtTime(987.77, now + 0.2);
+          gain.gain.setValueAtTime(0.18, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+          osc.start(now);
+          osc.stop(now + 0.36);
+        } else if (type === 'incorrect') {
+          // Low buzzing thump
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(180, now);
+          osc.frequency.linearRampToValueAtTime(110, now + 0.2);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+          osc.start(now);
+          osc.stop(now + 0.26);
+        } else if (type === 'click') {
+          // Subtle click
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(400, now);
+          gain.gain.setValueAtTime(0.08, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+          osc.start(now);
+          osc.stop(now + 0.06);
+        }
+      } catch (e) {
+        // Audio error fallback
+      }
+    }
+
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      localStorage.setItem(STORAGE_KEY_SOUND, soundEnabled ? '1' : '0');
+      document.getElementById('soundOnIcon').classList.toggle('hidden', !soundEnabled);
+      document.getElementById('soundOffIcon').classList.toggle('hidden', soundEnabled);
+      showToast(soundEnabled ? 'Sound feedback ON 🔔' : 'Sound feedback OFF 🔕');
+    }
+
+    /* -------------------------------------------------------------
+       INITIALIZATION
+    ------------------------------------------------------------- */
+    window.addEventListener('DOMContentLoaded', () => {
+      initTheme();
+      initSound();
+      loadStoredData();
+      navigate('dashboard');
+    });
+
+    function initSound() {
+      const stored = localStorage.getItem(STORAGE_KEY_SOUND);
+      soundEnabled = stored === null ? true : stored === '1';
+      document.getElementById('soundOnIcon').classList.toggle('hidden', !soundEnabled);
+      document.getElementById('soundOffIcon').classList.toggle('hidden', soundEnabled);
+    }
+
+    function initTheme() {
+      const savedTheme = localStorage.getItem(STORAGE_KEY_THEME) || 'light';
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+        document.getElementById('themeIconSun').classList.remove('hidden');
+        document.getElementById('themeIconMoon').classList.add('hidden');
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.getElementById('themeIconSun').classList.add('hidden');
+        document.getElementById('themeIconMoon').classList.remove('hidden');
+      }
+    }
+
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem(STORAGE_KEY_THEME, isDark ? 'dark' : 'light');
+      document.getElementById('themeIconSun').classList.toggle('hidden', !isDark);
+      document.getElementById('themeIconMoon').classList.toggle('hidden', isDark);
+    }
+
+    function loadStoredData() {
+      try {
+        const storedM = localStorage.getItem(STORAGE_KEY_MOCKS);
+        if (storedM) {
+          mocks = JSON.parse(storedM);
+        } else {
+          mocks = DEFAULT_MOCKS;
+          saveMocks();
+        }
+
+        const storedA = localStorage.getItem(STORAGE_KEY_ATTEMPTS);
+        if (storedA) {
+          attempts = JSON.parse(storedA);
+        }
+      } catch (err) {
+        console.error(err);
+        mocks = DEFAULT_MOCKS;
+      }
+      refreshDashboardStats();
+    }
+
+    function saveMocks() {
+      localStorage.setItem(STORAGE_KEY_MOCKS, JSON.stringify(mocks));
+      refreshDashboardStats();
+    }
+
+    function saveAttempts() {
+      localStorage.setItem(STORAGE_KEY_ATTEMPTS, JSON.stringify(attempts));
+      refreshDashboardStats();
+    }
+
+    function resetToSampleTests() {
+      mocks = JSON.parse(JSON.stringify(DEFAULT_MOCKS));
+      saveMocks();
+      renderMockCards();
+      showToast('Loaded built-in mocks successfully!');
+    }
+
+    function generateRapid50Blitz() {
+      const blitzMock = {
+        id: 'mock_rapid_50_' + Date.now(),
+        title: '50-Question Speed Mock (30 Mins)',
+        category: 'Speed Blitz',
+        duration: 30,
+        positiveMarks: 1.0,
+        negativePenalty: 0.25,
+        description: 'Auto-generated 50 questions test configured for 30 minutes with instant reference summaries.',
+        updatedAt: new Date().toISOString(),
+        questions: generateRapid50QuestionSet()
+      };
+      mocks.unshift(blitzMock);
+      saveMocks();
+      renderMockCards();
+      showToast('Generated 50-Question (30 Mins) Mock Test! Click Start to play.');
+    }
+
+    /* -------------------------------------------------------------
+       NAVIGATION
+    ------------------------------------------------------------- */
+    function navigate(viewName) {
+      if (activeExam && viewName !== 'exam') {
+        const leave = confirmAction('You have a timed exam in progress! Submitting test before switching?');
+        if (!leave) return;
+        finalizeAndSubmitExam();
+      }
+
+      const views = {
+        dashboard: document.getElementById('viewDashboard'),
+        creator: document.getElementById('viewCreator'),
+        exam: document.getElementById('viewExamFull'),
+        obo: document.getElementById('viewExamOneByOne'),
+        results: document.getElementById('viewResults')
+      };
+
+      Object.keys(views).forEach(k => {
+        if (views[k]) views[k].classList.add('hidden');
+      });
+
+      if (views[viewName]) {
+        views[viewName].classList.remove('hidden');
+      }
+
+      // Update Tab highlight
+      document.querySelectorAll('.nav-tab').forEach(t => {
+        if (t.dataset.tab === viewName) {
+          t.className = 'nav-tab px-3.5 py-2 rounded-xl text-sm font-semibold transition text-brand-600 bg-brand-50 dark:bg-indigo-950/60 dark:text-brand-300';
+        } else {
+          t.className = 'nav-tab px-3.5 py-2 rounded-xl text-sm font-medium transition text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white';
+        }
+      });
+
+      if (viewName === 'dashboard') {
+        renderMockCards();
+        refreshDashboardStats();
+      } else if (viewName === 'results') {
+        renderAttemptsHistoryTable();
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* -------------------------------------------------------------
+       DASHBOARD LOGIC
+    ------------------------------------------------------------- */
+    function refreshDashboardStats() {
+      document.getElementById('statTotalMocks').textContent = mocks.length;
+      const totalQ = mocks.reduce((acc, m) => acc + (m.questions ? m.questions.length : 0), 0);
+      document.getElementById('statTotalQuestions').textContent = totalQ;
+      document.getElementById('statAttemptsCount').textContent = attempts.length;
+
+      if (attempts.length > 0) {
+        const avg = (attempts.reduce((a, c) => a + c.accuracy, 0) / attempts.length).toFixed(1);
+        document.getElementById('statAvgAccuracy').textContent = `${avg}%`;
+      } else {
+        document.getElementById('statAvgAccuracy').textContent = '0%';
+      }
+
+      const catSelect = document.getElementById('dashboardCategoryFilter');
+      const cats = Array.from(new Set(mocks.map(m => m.category || 'General').filter(Boolean)));
+      const cur = catSelect.value;
+      catSelect.innerHTML = `<option value="ALL">All Categories (${mocks.length})</option>` +
+        cats.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+      if (cats.includes(cur)) catSelect.value = cur;
+    }
+
+    function renderMockCards() {
+      const grid = document.getElementById('mockCardsGrid');
+      const emptyState = document.getElementById('noMocksState');
+      const q = (document.getElementById('dashboardSearchInput').value || '').toLowerCase().trim();
+      const cat = document.getElementById('dashboardCategoryFilter').value;
+
+      const filtered = mocks.filter(m => {
+        const matchQ = m.title.toLowerCase().includes(q) || (m.category && m.category.toLowerCase().includes(q));
+        const matchC = cat === 'ALL' || m.category === cat;
+        return matchQ && matchC;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        return;
+      }
+
+      emptyState.classList.add('hidden');
+      grid.innerHTML = filtered.map(mock => {
+        const qCount = mock.questions ? mock.questions.length : 0;
+        const totalMarks = (qCount * (mock.positiveMarks || 1)).toFixed(1);
+
+        return `
+          <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between group">
+            <div>
+              <div class="flex items-start justify-between gap-2 mb-2">
+                <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-brand-50 dark:bg-indigo-950/70 text-brand-600 dark:text-brand-300 border border-brand-200 dark:border-brand-800/80">
+                  ${escapeHtml(mock.category || 'Exam Mock')}
+                </span>
+                <span class="text-xs font-medium text-slate-400 flex items-center space-x-1">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                  <span>${mock.duration}m</span>
+                </span>
+              </div>
+
+              <h3 class="text-base font-bold text-slate-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400 transition line-clamp-2">
+                ${escapeHtml(mock.title)}
+              </h3>
+              
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
+                ${escapeHtml(mock.description || 'Practice under full timed exam simulator or check questions one-by-one with study summaries.')}
+              </p>
+
+              <div class="grid grid-cols-3 gap-2 py-3 my-3 border-y border-slate-100 dark:border-slate-800/80 text-center text-xs">
+                <div>
+                  <p class="text-slate-400 font-medium">Questions</p>
+                  <p class="font-bold text-slate-800 dark:text-slate-200 mt-0.5">${qCount}</p>
+                </div>
+                <div>
+                  <p class="text-slate-400 font-medium">Max Marks</p>
+                  <p class="font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">${totalMarks}</p>
+                </div>
+                <div>
+                  <p class="text-slate-400 font-medium">Penalty</p>
+                  <p class="font-bold text-red-500 mt-0.5">-${mock.negativePenalty || 0}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-2 pt-1">
+              <!-- Primary Start Test CTA -->
+              <button onclick="promptModeSelect('${mock.id}')" class="w-full py-2.5 px-3 bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-700 hover:to-indigo-700 text-white rounded-xl text-xs font-bold shadow-md transition flex items-center justify-center space-x-1.5 active:scale-95">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path></svg>
+                <span>Start Mock (Choose Mode)</span>
+              </button>
+
+              <!-- Secondary tools -->
+              <div class="flex items-center justify-between gap-1 pt-1">
+                <button onclick="editMock('${mock.id}')" class="flex-1 py-1.5 px-2 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-300 text-[11px] font-semibold transition" title="Edit Mock">
+                  ✏️ Edit
+                </button>
+                <button onclick="duplicateMock('${mock.id}')" class="py-1.5 px-2 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-300 text-[11px] transition" title="Duplicate">
+                  📋 Copy
+                </button>
+                <button onclick="exportSingleMockJSON('${mock.id}')" class="py-1.5 px-2 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-300 text-[11px] transition" title="Export JSON">
+                  💾 JSON
+                </button>
+                <button onclick="deleteMock('${mock.id}')" class="py-1.5 px-2 border border-red-200 dark:border-red-900/60 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-lg text-red-500 text-[11px] transition" title="Delete">
+                  🗑️
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    /* -------------------------------------------------------------
+       MODE SELECTION MODAL
+    ------------------------------------------------------------- */
+    function promptModeSelect(mockId) {
+      selectedMockForLaunch = mocks.find(m => m.id === mockId);
+      if (!selectedMockForLaunch) return;
+      if (!selectedMockForLaunch.questions || selectedMockForLaunch.questions.length === 0) {
+        showToast('This mock has no questions yet. Edit it first.', 'error');
+        return;
+      }
+
+      document.getElementById('modeModalMockTitle').textContent = `${selectedMockForLaunch.title} (${selectedMockForLaunch.questions.length} Questions)`;
+      document.getElementById('modeSelectModal').classList.remove('hidden');
+    }
+
+    function closeModeModal() {
+      document.getElementById('modeSelectModal').classList.add('hidden');
+      selectedMockForLaunch = null;
+    }
+
+    function launchExamMode(mode) {
+      if (!selectedMockForLaunch) return;
+      const mock = selectedMockForLaunch;
+      closeModeModal();
+
+      if (mode === 'FULL') {
+        startFullExam(mock);
+      } else {
+        startOneByOnePractice(mock);
+      }
+    }
+
+    /* -------------------------------------------------------------
+       CREATOR / QUESTION BUILDER
+    ------------------------------------------------------------- */
+    function startNewMockCreation() {
+      activeEditingMock = {
+        id: 'mock_' + Date.now(),
+        title: '',
+        category: 'General Awareness',
+        duration: 30,
+        positiveMarks: 1.0,
+        negativePenalty: 0.25,
+        description: '',
+        questions: [createEmptyQuestion()]
+      };
+      populateCreatorUI();
+      navigate('creator');
+    }
+
+    function editMock(mockId) {
+      const found = mocks.find(m => m.id === mockId);
+      if (!found) return;
+      activeEditingMock = JSON.parse(JSON.stringify(found));
+      if (!activeEditingMock.questions || activeEditingMock.questions.length === 0) {
+        activeEditingMock.questions = [createEmptyQuestion()];
+      }
+      populateCreatorUI();
+      navigate('creator');
+    }
+
+    function createEmptyQuestion() {
+      return {
+        id: 'q_' + Math.random().toString(36).substr(2, 9),
+        section: 'General',
+        text: '',
+        options: ['', '', '', ''],
+        correctOptionIndex: 0,
+        explanation: '',
+        studySummary: ''
+      };
+    }
+
+    function populateCreatorUI() {
+      document.getElementById('creatorHeading').textContent = activeEditingMock.title ? `Edit: ${activeEditingMock.title}` : 'Create Mock Test';
+      document.getElementById('metaTitle').value = activeEditingMock.title || '';
+      document.getElementById('metaCategory').value = activeEditingMock.category || '';
+      document.getElementById('metaDuration').value = activeEditingMock.duration || 30;
+      document.getElementById('metaPositive').value = activeEditingMock.positiveMarks ?? 1.0;
+      document.getElementById('metaNegative').value = activeEditingMock.negativePenalty ?? 0.25;
+      document.getElementById('metaDescription').value = activeEditingMock.description || '';
+      renderCreatorQuestions();
+    }
+
+    function populatePresetFiftyQuestions() {
+      activeEditingMock.duration = 30;
+      document.getElementById('metaDuration').value = 30;
+      if (!activeEditingMock.title) {
+        activeEditingMock.title = '50-Questions Speed Mock (30 Mins)';
+        document.getElementById('metaTitle').value = activeEditingMock.title;
+      }
+      activeEditingMock.questions = generateRapid50QuestionSet();
+      renderCreatorQuestions();
+      showToast('Loaded 50 questions & preset 30-minute timer!');
+    }
+
+    function renderCreatorQuestions() {
+      const container = document.getElementById('creatorQuestionsList');
+      const questions = activeEditingMock.questions;
+      document.getElementById('creatorQuestionCount').textContent = questions.length;
+
+      container.innerHTML = questions.map((q, qIndex) => {
+        const optionsHtml = q.options.map((optText, optIndex) => {
+          const isCorrect = q.correctOptionIndex === optIndex;
+          const letter = String.fromCharCode(65 + optIndex);
+          return `
+            <div class="flex items-center space-x-2.5">
+              <label class="flex items-center space-x-1.5 cursor-pointer" title="Mark as correct answer">
+                <input type="radio" name="correct_opt_${q.id}" ${isCorrect ? 'checked' : ''} onchange="updateCorrectOption(${qIndex}, ${optIndex})" class="w-4 h-4 text-brand-600 focus:ring-brand-500">
+                <span class="w-6 h-6 rounded-lg bg-slate-100 dark:bg-slate-800 text-xs font-bold flex items-center justify-center ${isCorrect ? 'bg-emerald-500 text-white dark:bg-emerald-600' : 'text-slate-600 dark:text-slate-300'}">
+                  ${letter}
+                </span>
+              </label>
+              <input type="text" value="${escapeHtml(optText)}" oninput="updateOptionText(${qIndex}, ${optIndex}, this.value)" placeholder="Option ${letter}" class="flex-1 px-3 py-1.5 bg-white dark:bg-slate-800/80 border ${isCorrect ? 'border-emerald-400 dark:border-emerald-600' : 'border-slate-200 dark:border-slate-700'} rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+              ${q.options.length > 2 ? `
+                <button onclick="removeOptionFromQuestion(${qIndex}, ${optIndex})" class="text-slate-400 hover:text-red-500 p-1 rounded transition" title="Remove option">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+              ` : ''}
+            </div>
+          `;
+        }).join('');
+
+        return `
+          <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm space-y-3">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
+              <div class="flex items-center space-x-2">
+                <span class="w-6 h-6 rounded-lg bg-brand-100 dark:bg-brand-950 text-brand-700 dark:text-brand-300 text-xs font-bold flex items-center justify-center">
+                  ${qIndex + 1}
+                </span>
+                <input type="text" value="${escapeHtml(q.section || 'General')}" oninput="updateQuestionSection(${qIndex}, this.value)" placeholder="Subject / Section" class="px-2 py-0.5 text-xs font-medium rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-1 focus:ring-brand-500">
+              </div>
+
+              <div class="flex items-center space-x-1">
+                ${qIndex > 0 ? `
+                  <button onclick="moveQuestion(${qIndex}, -1)" class="p-1 text-slate-400 hover:text-slate-700 dark:hover:text-white" title="Move Up">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
+                  </button>
+                ` : ''}
+                ${qIndex < questions.length - 1 ? `
+                  <button onclick="moveQuestion(${qIndex}, 1)" class="p-1 text-slate-400 hover:text-slate-700 dark:hover:text-white" title="Move Down">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                  </button>
+                ` : ''}
+                <button onclick="duplicateQuestion(${qIndex})" class="p-1 text-slate-400 hover:text-slate-700 dark:hover:text-white" title="Duplicate Question">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path></svg>
+                </button>
+                <button onclick="deleteQuestion(${qIndex})" class="p-1 text-red-400 hover:text-red-600" title="Delete Question">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Statement -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Question Prompt *</label>
+              <textarea rows="2" oninput="updateQuestionText(${qIndex}, this.value)" placeholder="Enter the question text..." class="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">${escapeHtml(q.text)}</textarea>
+            </div>
+
+            <!-- Options -->
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold text-slate-500 uppercase">Options (Select radio for correct answer)</span>
+                ${q.options.length < 5 ? `
+                  <button onclick="addOptionToQuestion(${qIndex})" class="text-xs font-semibold text-brand-600 dark:text-brand-400 hover:underline">+ Add Option</button>
+                ` : ''}
+              </div>
+              ${optionsHtml}
+            </div>
+
+            <!-- Explanation & Study Material Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+              <div>
+                <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Answer Explanation</label>
+                <textarea rows="2" oninput="updateQuestionExplanation(${qIndex}, this.value)" placeholder="Briefly explain why this answer is correct..." class="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-500">${escapeHtml(q.explanation || '')}</textarea>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-teal-600 dark:text-teal-400 uppercase mb-1">📚 Study Material & Reference Notes / Summary</label>
+                <textarea rows="2" oninput="updateQuestionStudySummary(${qIndex}, this.value)" placeholder="Key formulas, mnemonics, articles, or summary facts for candidate revision..." class="w-full px-3 py-1.5 bg-teal-50/40 dark:bg-slate-800 border border-teal-200 dark:border-slate-700 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-teal-500">${escapeHtml(q.studySummary || '')}</textarea>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function addQuestionTemplate() {
+      activeEditingMock.questions.push(createEmptyQuestion());
+      renderCreatorQuestions();
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+
+    function deleteQuestion(i) {
+      if (activeEditingMock.questions.length <= 1) {
+        showToast('Must have at least 1 question!', 'error');
+        return;
+      }
+      activeEditingMock.questions.splice(i, 1);
+      renderCreatorQuestions();
+    }
+
+    function duplicateQuestion(i) {
+      const clone = JSON.parse(JSON.stringify(activeEditingMock.questions[i]));
+      clone.id = 'q_' + Math.random().toString(36).substr(2, 9);
+      activeEditingMock.questions.splice(i + 1, 0, clone);
+      renderCreatorQuestions();
+      showToast('Question duplicated');
+    }
+
+    function moveQuestion(index, dir) {
+      const target = index + dir;
+      if (target < 0 || target >= activeEditingMock.questions.length) return;
+      const tmp = activeEditingMock.questions[index];
+      activeEditingMock.questions[index] = activeEditingMock.questions[target];
+      activeEditingMock.questions[target] = tmp;
+      renderCreatorQuestions();
+    }
+
+    function updateQuestionSection(i, val) { activeEditingMock.questions[i].section = val; }
+    function updateQuestionText(i, val) { activeEditingMock.questions[i].text = val; }
+    function updateOptionText(qi, oi, val) { activeEditingMock.questions[qi].options[oi] = val; }
+    function updateCorrectOption(qi, oi) { activeEditingMock.questions[qi].correctOptionIndex = oi; renderCreatorQuestions(); }
+    function addOptionToQuestion(qi) { if (activeEditingMock.questions[qi].options.length < 5) { activeEditingMock.questions[qi].options.push(''); renderCreatorQuestions(); } }
+    function removeOptionFromQuestion(qi, oi) {
+      if (activeEditingMock.questions[qi].options.length <= 2) return;
+      activeEditingMock.questions[qi].options.splice(oi, 1);
+      if (activeEditingMock.questions[qi].correctOptionIndex >= activeEditingMock.questions[qi].options.length) {
+        activeEditingMock.questions[qi].correctOptionIndex = 0;
+      }
+      renderCreatorQuestions();
+    }
+    function updateQuestionExplanation(i, val) { activeEditingMock.questions[i].explanation = val; }
+    function updateQuestionStudySummary(i, val) { activeEditingMock.questions[i].studySummary = val; }
+
+    function saveActiveMock() {
+      const title = document.getElementById('metaTitle').value.trim();
+      const cat = document.getElementById('metaCategory').value.trim() || 'General';
+      const dur = parseInt(document.getElementById('metaDuration').value, 10) || 30;
+      const pos = parseFloat(document.getElementById('metaPositive').value) || 1.0;
+      const neg = parseFloat(document.getElementById('metaNegative').value) || 0;
+      const desc = document.getElementById('metaDescription').value.trim();
+
+      if (!title) {
+        showToast('Please enter a mock title!', 'error');
+        return;
+      }
+
+      for (let i = 0; i < activeEditingMock.questions.length; i++) {
+        const q = activeEditingMock.questions[i];
+        if (!q.text.trim()) {
+          showToast(`Question #${i + 1} has an empty statement!`, 'error');
+          return;
+        }
+        for (let j = 0; j < q.options.length; j++) {
+          if (!q.options[j].trim()) {
+            showToast(`Option ${String.fromCharCode(65 + j)} in Question #${i + 1} cannot be empty!`, 'error');
+            return;
+          }
+        }
+      }
+
+      activeEditingMock.title = title;
+      activeEditingMock.category = cat;
+      activeEditingMock.duration = dur;
+      activeEditingMock.positiveMarks = pos;
+      activeEditingMock.negativePenalty = neg;
+      activeEditingMock.description = desc;
+      activeEditingMock.updatedAt = new Date().toISOString();
+
+      const existingIdx = mocks.findIndex(m => m.id === activeEditingMock.id);
+      if (existingIdx >= 0) {
+        mocks[existingIdx] = JSON.parse(JSON.stringify(activeEditingMock));
+      } else {
+        mocks.unshift(JSON.parse(JSON.stringify(activeEditingMock)));
+      }
+
+      saveMocks();
+      showToast('Mock test saved!');
+      navigate('dashboard');
+    }
+
+    /* -------------------------------------------------------------
+       MODE A: FULL EXAM SIMULATOR (TIMED e.g. 50 Q in 30 mins)
+    ------------------------------------------------------------- */
+    function startFullExam(mock) {
+      activeExam = {
+        mock: JSON.parse(JSON.stringify(mock)),
+        currentIndex: 0,
+        activeSection: 'ALL',
+        responses: mock.questions.map(() => ({
+          selectedOption: null,
+          status: 'NOT_VISITED'
+        })),
+        startTime: Date.now(),
+        totalDurationSeconds: (mock.duration || 30) * 60
+      };
+
+      activeExam.responses[0].status = 'NOT_ANSWERED';
+
+      document.getElementById('examPortalTitle').textContent = mock.title;
+      document.getElementById('examPortalCategory').textContent = mock.category || 'Exam';
+      document.getElementById('examPortalPos').textContent = mock.positiveMarks || 1;
+      document.getElementById('examPortalNeg').textContent = mock.negativePenalty || 0;
+
+      buildFullExamSections();
+      startFullExamTimer();
+      renderFullExamQuestion();
+      renderFullExamPalette();
+      updatePaletteCounts();
+
+      navigate('exam');
+    }
+
+    function buildFullExamSections() {
+      const bar = document.getElementById('examSectionNavBar');
+      const sections = Array.from(new Set(activeExam.mock.questions.map(q => q.section || 'General').filter(Boolean)));
+      
+      let html = `
+        <button onclick="switchFullExamSection('ALL')" id="fullSec_ALL" class="sec-tab-btn px-3 py-1 rounded-lg bg-brand-600 text-white font-semibold whitespace-nowrap">
+          All Sections (${activeExam.mock.questions.length})
+        </button>
+      `;
+
+      sections.forEach(sec => {
+        const count = activeExam.mock.questions.filter(q => (q.section || 'General') === sec).length;
+        html += `
+          <button onclick="switchFullExamSection('${escapeHtml(sec)}')" id="fullSec_${escapeHtml(sec)}" class="sec-tab-btn px-3 py-1 rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium hover:bg-slate-200 dark:hover:bg-slate-600 whitespace-nowrap transition">
+            ${escapeHtml(sec)} (${count})
+          </button>
+        `;
+      });
+      bar.innerHTML = html;
+    }
+
+    function switchFullExamSection(secName) {
+      activeExam.activeSection = secName;
+      document.querySelectorAll('.sec-tab-btn').forEach(btn => {
+        btn.className = 'sec-tab-btn px-3 py-1 rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium hover:bg-slate-200 dark:hover:bg-slate-600 whitespace-nowrap transition';
+      });
+      const activeBtn = document.getElementById(`fullSec_${secName}`);
+      if (activeBtn) activeBtn.className = 'sec-tab-btn px-3 py-1 rounded-lg bg-brand-600 text-white font-semibold whitespace-nowrap';
+
+      const curQ = activeExam.mock.questions[activeExam.currentIndex];
+      const curSection = curQ.section || 'General';
+      if (secName !== 'ALL' && curSection !== secName) {
+        const firstSecIdx = activeExam.mock.questions.findIndex(q => (q.section || 'General') === secName);
+        if (firstSecIdx !== -1) jumpToFullQuestion(firstSecIdx);
+      }
+      renderFullExamPalette();
+    }
+
+    function startFullExamTimer() {
+      if (examTimerInterval) clearInterval(examTimerInterval);
+      examTimeElapsed = 0;
+
+      const timerDisplay = document.getElementById('examTimerDisplay');
+      const timerBadge = document.getElementById('examTimerBadge');
+
+      function updateClock() {
+        const remaining = activeExam.totalDurationSeconds - examTimeElapsed;
+        if (remaining <= 0) {
+          clearInterval(examTimerInterval);
+          timerDisplay.textContent = '00:00:00';
+          showToast('Time is up! Auto submitting...', 'warning');
+          finalizeAndSubmitExam();
+          return;
+        }
+
+        const hrs = Math.floor(remaining / 3600);
+        const mins = Math.floor((remaining % 3600) / 60);
+        const secs = remaining % 60;
+        timerDisplay.textContent = `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+
+        if (remaining <= 180) {
+          timerBadge.classList.add('border-red-500', 'text-red-400', 'animate-pulse-subtle');
+        } else {
+          timerBadge.classList.remove('border-red-500', 'text-red-400', 'animate-pulse-subtle');
+        }
+        examTimeElapsed++;
+      }
+      updateClock();
+      examTimerInterval = setInterval(updateClock, 1000);
+    }
+
+    function renderFullExamQuestion() {
+      const idx = activeExam.currentIndex;
+      const q = activeExam.mock.questions[idx];
+      const resp = activeExam.responses[idx];
+
+      document.getElementById('currentQNum').textContent = idx + 1;
+      document.getElementById('totalQNum').textContent = activeExam.mock.questions.length;
+      document.getElementById('currentQMarks').textContent = `+${activeExam.mock.positiveMarks || 1}`;
+      document.getElementById('currentQNeg').textContent = `-${activeExam.mock.negativePenalty || 0}`;
+      document.getElementById('currentQText').textContent = q.text;
+
+      const container = document.getElementById('currentQOptionsContainer');
+      container.innerHTML = q.options.map((opt, optIdx) => {
+        const isSelected = resp.selectedOption === optIdx;
+        const letter = String.fromCharCode(65 + optIdx);
+        return `
+          <label class="flex items-center space-x-3.5 p-3.5 rounded-2xl border cursor-pointer transition ${
+            isSelected
+              ? 'bg-brand-50/80 dark:bg-indigo-950/50 border-brand-500 text-brand-900 dark:text-indigo-200 shadow-sm'
+              : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700/80 hover:bg-slate-50 dark:hover:bg-slate-750'
+          }">
+            <input type="radio" name="full_exam_opt" value="${optIdx}" ${isSelected ? 'checked' : ''} onchange="handleFullSelectOption(${optIdx})" class="w-4 h-4 text-brand-600 focus:ring-brand-500">
+            <span class="w-6 h-6 rounded-md font-bold text-xs flex items-center justify-center ${isSelected ? 'bg-brand-600 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300'}">
+              ${letter}
+            </span>
+            <span class="text-sm font-medium leading-relaxed">${escapeHtml(opt)}</span>
+          </label>
+        `;
+      }).join('');
+    }
+
+    function handleFullSelectOption(optIdx) {
+      playTone('click');
+      const idx = activeExam.currentIndex;
+      activeExam.responses[idx].selectedOption = optIdx;
+      if (activeExam.responses[idx].status === 'MARKED' || activeExam.responses[idx].status === 'ANSWERED_MARKED') {
+        activeExam.responses[idx].status = 'ANSWERED_MARKED';
+      } else {
+        activeExam.responses[idx].status = 'ANSWERED';
+      }
+      renderFullExamQuestion();
+      renderFullExamPalette();
+      updatePaletteCounts();
+    }
+
+    function handleClearResponse() {
+      playTone('click');
+      const idx = activeExam.currentIndex;
+      activeExam.responses[idx].selectedOption = null;
+      activeExam.responses[idx].status = 'NOT_ANSWERED';
+      renderFullExamQuestion();
+      renderFullExamPalette();
+      updatePaletteCounts();
+    }
+
+    function handleSaveAndNext() {
+      playTone('click');
+      const idx = activeExam.currentIndex;
+      const resp = activeExam.responses[idx];
+      resp.status = (resp.selectedOption !== null) ? 'ANSWERED' : 'NOT_ANSWERED';
+
+      if (activeExam.currentIndex < activeExam.mock.questions.length - 1) {
+        jumpToFullQuestion(activeExam.currentIndex + 1);
+      } else {
+        openSubmitConfirmModal();
+      }
+    }
+
+    function handleMarkForReview() {
+      playTone('click');
+      const idx = activeExam.currentIndex;
+      const resp = activeExam.responses[idx];
+      resp.status = (resp.selectedOption !== null) ? 'ANSWERED_MARKED' : 'MARKED';
+
+      if (activeExam.currentIndex < activeExam.mock.questions.length - 1) {
+        jumpToFullQuestion(activeExam.currentIndex + 1);
+      } else {
+        openSubmitConfirmModal();
+      }
+    }
+
+    function handlePreviousQuestion() {
+      if (activeExam.currentIndex > 0) {
+        jumpToFullQuestion(activeExam.currentIndex - 1);
+      }
+    }
+
+    function jumpToFullQuestion(index) {
+      if (index < 0 || index >= activeExam.mock.questions.length) return;
+      activeExam.currentIndex = index;
+      if (activeExam.responses[index].status === 'NOT_VISITED') {
+        activeExam.responses[index].status = 'NOT_ANSWERED';
+      }
+      renderFullExamQuestion();
+      renderFullExamPalette();
+      updatePaletteCounts();
+    }
+
+    function renderFullExamPalette() {
+      const grid = document.getElementById('questionPaletteGrid');
+      const questions = activeExam.mock.questions;
+      const activeSec = activeExam.activeSection;
+
+      grid.innerHTML = questions.map((q, idx) => {
+        if (activeSec !== 'ALL' && (q.section || 'General') !== activeSec) return '';
+
+        const resp = activeExam.responses[idx];
+        const isCurrent = activeExam.currentIndex === idx;
+        let statusBg = 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200';
+        let dot = '';
+
+        if (resp.status === 'ANSWERED') {
+          statusBg = 'bg-green-500 text-white font-bold';
+        } else if (resp.status === 'NOT_ANSWERED') {
+          statusBg = 'bg-red-500 text-white font-bold';
+        } else if (resp.status === 'MARKED') {
+          statusBg = 'bg-purple-500 text-white font-bold';
+        } else if (resp.status === 'ANSWERED_MARKED') {
+          statusBg = 'bg-purple-600 text-white font-bold relative';
+          dot = '<span class="absolute top-0.5 right-0.5 w-2 h-2 rounded-full bg-green-400"></span>';
+        }
+
+        const borderRing = isCurrent ? 'ring-2 ring-brand-500 ring-offset-2 dark:ring-offset-slate-900 font-extrabold scale-105' : '';
+
+        return `
+          <button onclick="jumpToFullQuestion(${idx})" class="w-10 h-10 rounded-xl flex items-center justify-center text-xs transition active:scale-95 shadow-sm ${statusBg} ${borderRing}">
+            ${idx + 1}
+            ${dot}
+          </button>
+        `;
+      }).join('');
+    }
+
+    function updatePaletteCounts() {
+      let ans = 0, notAns = 0, marked = 0, notVis = 0;
+      activeExam.responses.forEach(r => {
+        if (r.status === 'ANSWERED') ans++;
+        else if (r.status === 'NOT_ANSWERED') notAns++;
+        else if (r.status === 'MARKED') marked++;
+        else if (r.status === 'ANSWERED_MARKED') { ans++; marked++; }
+        else notVis++;
+      });
+      document.getElementById('legendCountAnswered').textContent = ans;
+      document.getElementById('legendCountNotAnswered').textContent = notAns;
+      document.getElementById('legendCountMarked').textContent = marked;
+      document.getElementById('legendCountNotVisited').textContent = notVis;
+    }
+
+    function openSubmitConfirmModal() {
+      let ans = 0, marked = 0, unans = 0;
+      activeExam.responses.forEach(r => {
+        if (r.selectedOption !== null) ans++;
+        else unans++;
+        if (r.status === 'MARKED' || r.status === 'ANSWERED_MARKED') marked++;
+      });
+
+      document.getElementById('modalSummaryTotal').textContent = activeExam.mock.questions.length;
+      document.getElementById('modalSummaryAnswered').textContent = ans;
+      document.getElementById('modalSummaryMarked').textContent = marked;
+      document.getElementById('modalSummaryUnanswered').textContent = unans;
+      document.getElementById('submitConfirmModal').classList.remove('hidden');
+    }
+
+    function closeSubmitConfirmModal() {
+      document.getElementById('submitConfirmModal').classList.add('hidden');
+    }
+
+    function finalizeAndSubmitExam() {
+      if (!activeExam) return;
+      closeSubmitConfirmModal();
+      clearInterval(examTimerInterval);
+
+      const mock = activeExam.mock;
+      const questions = mock.questions;
+      const responses = activeExam.responses;
+      const pos = mock.positiveMarks || 1.0;
+      const neg = mock.negativePenalty || 0;
+
+      let correctCount = 0;
+      let incorrectCount = 0;
+      let unattemptedCount = 0;
+      let totalScore = 0;
+
+      const breakdown = questions.map((q, i) => {
+        const choice = responses[i].selectedOption;
+        const attempted = choice !== null;
+        const isCorrect = attempted && choice === q.correctOptionIndex;
+
+        let delta = 0;
+        if (attempted) {
+          if (isCorrect) {
+            delta = pos;
+            correctCount++;
+          } else {
+            delta = -neg;
+            incorrectCount++;
+          }
+        } else {
+          unattemptedCount++;
+        }
+        totalScore += delta;
+
+        return {
+          questionId: q.id,
+          questionText: q.text,
+          section: q.section || 'General',
+          options: q.options,
+          correctOptionIndex: q.correctOptionIndex,
+          userChoice: choice,
+          isCorrect: isCorrect,
+          isAttempted: attempted,
+          scoreDelta: delta,
+          explanation: q.explanation || '',
+          studySummary: q.studySummary || ''
+        };
+      });
+
+      const attemptedCount = correctCount + incorrectCount;
+      const accuracy = attemptedCount > 0 ? (correctCount / attemptedCount) * 100 : 0;
+      const maxScore = questions.length * pos;
+
+      const result = {
+        id: 'attempt_' + Date.now(),
+        mockId: mock.id,
+        mockTitle: mock.title,
+        mode: 'Full Timed Exam',
+        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        timestamp: Date.now(),
+        timeSpentSeconds: examTimeElapsed,
+        score: Math.max(0, parseFloat(totalScore.toFixed(2))),
+        maxScore: maxScore,
+        accuracy: parseFloat(accuracy.toFixed(1)),
+        correctCount: correctCount,
+        incorrectCount: incorrectCount,
+        unattemptedCount: unattemptedCount,
+        attemptedCount: attemptedCount,
+        questionBreakdown: breakdown
+      };
+
+      attempts.unshift(result);
+      saveAttempts();
+      activeExam = null;
+      showResultAnalytics(result);
+    }
+
+    /* -------------------------------------------------------------
+       MODE B: ONE-BY-ONE INSTANT FEEDBACK PRACTICE MODE
+    ------------------------------------------------------------- */
+    function startOneByOnePractice(mock) {
+      activeObo = {
+        mock: JSON.parse(JSON.stringify(mock)),
+        currentIndex: 0,
+        runningScore: 0,
+        streak: 0,
+        answeredState: {}, // maps index -> { selectedOpt, checked: true, isCorrect }
+        startTime: Date.now()
+      };
+
+      document.getElementById('oboMockTitle').textContent = mock.title;
+      document.getElementById('oboPosMark').textContent = mock.positiveMarks || 1;
+      document.getElementById('oboNegMark').textContent = mock.negativePenalty || 0;
+      document.getElementById('oboTotalQNum').textContent = mock.questions.length;
+
+      renderOboQuestion();
+      navigate('obo');
+    }
+
+    function renderOboQuestion() {
+      const idx = activeObo.currentIndex;
+      const q = activeObo.mock.questions[idx];
+      const state = activeObo.answeredState[idx];
+
+      document.getElementById('oboCurrentQNum').textContent = idx + 1;
+      document.getElementById('oboSectionTag').textContent = q.section || 'General';
+      document.getElementById('oboQuestionText').textContent = q.text;
+      document.getElementById('oboStreakCount').textContent = activeObo.streak;
+      document.getElementById('oboScoreDisplay').textContent = activeObo.runningScore.toFixed(2);
+
+      // Previous button state
+      document.getElementById('oboPrevBtn').disabled = (idx === 0);
+      document.getElementById('oboPrevBtn').classList.toggle('opacity-50', idx === 0);
+
+      // Render Options
+      const container = document.getElementById('oboOptionsContainer');
+      const hasAnswered = !!state;
+
+      container.innerHTML = q.options.map((opt, optIdx) => {
+        const letter = String.fromCharCode(65 + optIdx);
+        let borderClasses = 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-teal-400';
+        let badgeContent = letter;
+        let badgeClass = 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300';
+
+        if (hasAnswered) {
+          const isCorrect = (optIdx === q.correctOptionIndex);
+          const isChosen = (optIdx === state.selectedOpt);
+
+          if (isCorrect) {
+            borderClasses = 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-200 ring-2 ring-emerald-500 font-semibold';
+            badgeClass = 'bg-emerald-600 text-white';
+            badgeContent = '✓';
+          } else if (isChosen && !isCorrect) {
+            borderClasses = 'border-red-500 bg-red-50 dark:bg-red-950/40 text-red-900 dark:text-red-200 font-semibold';
+            badgeClass = 'bg-red-600 text-white';
+            badgeContent = '✗';
+          } else {
+            borderClasses = 'opacity-50 border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900';
+          }
+        }
+
+        return `
+          <div onclick="${hasAnswered ? '' : `handleOboSelect(${optIdx})`}" class="flex items-center space-x-3.5 p-4 rounded-2xl border ${hasAnswered ? 'cursor-default' : 'cursor-pointer'} transition shadow-sm ${borderClasses}">
+            <span class="w-7 h-7 rounded-lg font-bold text-xs flex items-center justify-center ${badgeClass}">
+              ${badgeContent}
+            </span>
+            <span class="text-sm font-medium leading-relaxed">${escapeHtml(opt)}</span>
+          </div>
+        `;
+      }).join('');
+
+      // Feedback banner
+      const banner = document.getElementById('oboFeedbackBanner');
+      const bannerText = document.getElementById('oboFeedbackText');
+      const bannerDelta = document.getElementById('oboFeedbackDelta');
+
+      if (hasAnswered) {
+        banner.classList.remove('hidden');
+        if (state.isCorrect) {
+          banner.className = 'p-4 rounded-2xl border border-emerald-300 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 text-sm font-bold flex items-center justify-between';
+          bannerText.innerHTML = `<span>🎉 Brilliant! Correct Answer!</span>`;
+          bannerDelta.textContent = `+${activeObo.mock.positiveMarks || 1}`;
+        } else {
+          banner.className = 'p-4 rounded-2xl border border-red-300 bg-red-50 dark:bg-red-950/50 text-red-800 dark:text-red-300 text-sm font-bold flex items-center justify-between';
+          bannerText.innerHTML = `<span>❌ Oops! Incorrect choice. Correct option was ${String.fromCharCode(65 + q.correctOptionIndex)}</span>`;
+          bannerDelta.textContent = `-${activeObo.mock.negativePenalty || 0}`;
+        }
+      } else {
+        banner.classList.add('hidden');
+      }
+
+      // Key Study Material & Summary below question
+      const summaryContent = document.getElementById('oboStudySummaryContent');
+      const summaryText = q.studySummary || q.explanation || 'No reference note added yet for this question. Click "Quick Edit Material" to add key points, formulas, or mnemonics.';
+      summaryContent.textContent = summaryText;
+
+      // Close live editor drawer if open
+      document.getElementById('oboEditNotesDrawer').classList.add('hidden');
+    }
+
+    function handleOboSelect(optIdx) {
+      const idx = activeObo.currentIndex;
+      const q = activeObo.mock.questions[idx];
+      const isCorrect = (optIdx === q.correctOptionIndex);
+
+      const pos = activeObo.mock.positiveMarks || 1.0;
+      const neg = activeObo.mock.negativePenalty || 0;
+
+      if (isCorrect) {
+        activeObo.runningScore += pos;
+        activeObo.streak += 1;
+        playTone('correct');
+      } else {
+        activeObo.runningScore = Math.max(0, activeObo.runningScore - neg);
+        activeObo.streak = 0;
+        playTone('incorrect');
+      }
+
+      activeObo.answeredState[idx] = {
+        selectedOpt: optIdx,
+        isCorrect: isCorrect
+      };
+
+      renderOboQuestion();
+    }
+
+    function oboNextQuestion() {
+      playTone('click');
+      if (activeObo.currentIndex < activeObo.mock.questions.length - 1) {
+        activeObo.currentIndex++;
+        renderOboQuestion();
+      } else {
+        // Conclude Practice
+        finishOneByOneSession();
+      }
+    }
+
+    function oboPreviousQuestion() {
+      if (activeObo.currentIndex > 0) {
+        activeObo.currentIndex--;
+        renderOboQuestion();
+      }
+    }
+
+    function toggleEditStudyNotes() {
+      const drawer = document.getElementById('oboEditNotesDrawer');
+      const isHidden = drawer.classList.contains('hidden');
+      if (isHidden) {
+        const curQ = activeObo.mock.questions[activeObo.currentIndex];
+        document.getElementById('oboLiveStudyNotesInput').value = curQ.studySummary || '';
+        drawer.classList.remove('hidden');
+      } else {
+        drawer.classList.add('hidden');
+      }
+    }
+
+    function saveLiveStudyNotes() {
+      const notes = document.getElementById('oboLiveStudyNotesInput').value;
+      const curQ = activeObo.mock.questions[activeObo.currentIndex];
+      curQ.studySummary = notes;
+
+      // Also persist to master mock list in memory & storage
+      const masterMock = mocks.find(m => m.id === activeObo.mock.id);
+      if (masterMock && masterMock.questions[activeObo.currentIndex]) {
+        masterMock.questions[activeObo.currentIndex].studySummary = notes;
+        saveMocks();
+      }
+
+      toggleEditStudyNotes();
+      renderOboQuestion();
+      showToast('Study Material note saved on the fly!');
+    }
+
+    function finishOneByOneSession() {
+      const mock = activeObo.mock;
+      const questions = mock.questions;
+      let correct = 0;
+      let incorrect = 0;
+      let unattempted = 0;
+
+      const breakdown = questions.map((q, i) => {
+        const st = activeObo.answeredState[i];
+        const attempted = !!st;
+        const isCorrect = attempted && st.isCorrect;
+
+        if (attempted) {
+          if (isCorrect) correct++;
+          else incorrect++;
+        } else {
+          unattempted++;
+        }
+
+        return {
+          questionId: q.id,
+          questionText: q.text,
+          section: q.section || 'General',
+          options: q.options,
+          correctOptionIndex: q.correctOptionIndex,
+          userChoice: attempted ? st.selectedOpt : null,
+          isCorrect: isCorrect,
+          isAttempted: attempted,
+          scoreDelta: attempted ? (isCorrect ? (mock.positiveMarks || 1) : -(mock.negativePenalty || 0)) : 0,
+          explanation: q.explanation || '',
+          studySummary: q.studySummary || ''
+        };
+      });
+
+      const totalAttempted = correct + incorrect;
+      const accuracy = totalAttempted > 0 ? (correct / totalAttempted) * 100 : 0;
+      const maxScore = questions.length * (mock.positiveMarks || 1);
+      const timeSpent = Math.floor((Date.now() - activeObo.startTime) / 1000);
+
+      const attemptResult = {
+        id: 'attempt_' + Date.now(),
+        mockId: mock.id,
+        mockTitle: mock.title,
+        mode: 'One-by-One Practice',
+        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        timestamp: Date.now(),
+        timeSpentSeconds: timeSpent,
+        score: Math.max(0, parseFloat(activeObo.runningScore.toFixed(2))),
+        maxScore: maxScore,
+        accuracy: parseFloat(accuracy.toFixed(1)),
+        correctCount: correct,
+        incorrectCount: incorrect,
+        unattemptedCount: unattempted,
+        attemptedCount: totalAttempted,
+        questionBreakdown: breakdown
+      };
+
+      attempts.unshift(attemptResult);
+      saveAttempts();
+      activeObo = null;
+      showResultAnalytics(attemptResult);
+    }
+
+    /* -------------------------------------------------------------
+       RESULTS & STUDY SUMMARY REVIEW
+    ------------------------------------------------------------- */
+    function showResultAnalytics(attempt) {
+      activeResultAttempt = attempt;
+      document.getElementById('resModeBadge').textContent = attempt.mode || 'Completed';
+      document.getElementById('resExamTitle').textContent = attempt.mockTitle;
+      document.getElementById('resExamDate').textContent = `Finished on ${attempt.date}`;
+      document.getElementById('resTotalScore').textContent = attempt.score.toFixed(2);
+      document.getElementById('resMaxScore').textContent = attempt.maxScore.toFixed(1);
+      document.getElementById('resAccuracy').textContent = `${attempt.accuracy}%`;
+      document.getElementById('resCorrectCount').textContent = attempt.correctCount;
+      document.getElementById('resIncorrectCount').textContent = attempt.incorrectCount;
+      document.getElementById('resAttemptedCount').textContent = attempt.attemptedCount;
+      document.getElementById('resUnattemptedCount').textContent = attempt.unattemptedCount;
+
+      const mins = Math.floor(attempt.timeSpentSeconds / 60);
+      const secs = attempt.timeSpentSeconds % 60;
+      document.getElementById('resTimeSpent').textContent = `${mins}m ${secs}s`;
+
+      filterReviewQuestions('ALL');
+      renderAttemptsHistoryTable();
+      navigate('results');
+    }
+
+    function filterReviewQuestions(type) {
+      currentReviewFilter = type;
+      const btns = {
+        ALL: document.getElementById('filterBtnAll'),
+        CORRECT: document.getElementById('filterBtnCorrect'),
+        INCORRECT: document.getElementById('filterBtnIncorrect'),
+        UNATTEMPTED: document.getElementById('filterBtnUnattempted')
+      };
+
+      Object.keys(btns).forEach(k => {
+        if (k === type) {
+          btns[k].className = 'px-3 py-1.5 rounded-lg bg-brand-600 text-white shadow-sm';
+        } else {
+          btns[k].className = 'px-3 py-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition';
+        }
+      });
+      renderReviewQuestionItems();
+    }
+
+    function renderReviewQuestionItems() {
+      if (!activeResultAttempt) return;
+      const container = document.getElementById('resultsReviewContainer');
+      const items = activeResultAttempt.questionBreakdown;
+
+      const filtered = items.filter(it => {
+        if (currentReviewFilter === 'CORRECT') return it.isCorrect;
+        if (currentReviewFilter === 'INCORRECT') return it.isAttempted && !it.isCorrect;
+        if (currentReviewFilter === 'UNATTEMPTED') return !it.isAttempted;
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="p-8 text-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl text-slate-400 text-xs">No questions in this filter.</div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map((item, index) => {
+        let badgeColor = 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300';
+        let statusText = 'Skipped / Unattempted';
+        let scoreTag = '+0.00';
+
+        if (item.isAttempted) {
+          if (item.isCorrect) {
+            badgeColor = 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300';
+            statusText = 'Correct Answer';
+            scoreTag = `+${item.scoreDelta}`;
+          } else {
+            badgeColor = 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300 border border-red-300';
+            statusText = 'Incorrect Answer';
+            scoreTag = `${item.scoreDelta}`;
+          }
+        }
+
+        const optionsHtml = item.options.map((opt, optIdx) => {
+          const letter = String.fromCharCode(65 + optIdx);
+          const isCorrect = optIdx === item.correctOptionIndex;
+          const isUserChoice = optIdx === item.userChoice;
+
+          let border = 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900';
+          let tag = '';
+
+          if (isCorrect) {
+            border = 'border-emerald-500 bg-emerald-50/60 dark:bg-emerald-950/40 text-emerald-950 dark:text-emerald-200 font-semibold';
+            tag = '<span class="ml-auto text-xs px-2 py-0.5 rounded bg-emerald-500 text-white font-bold">Correct</span>';
+          } else if (isUserChoice && !isCorrect) {
+            border = 'border-red-500 bg-red-50/60 dark:bg-red-950/40 text-red-900 dark:text-red-200 font-semibold';
+            tag = '<span class="ml-auto text-xs px-2 py-0.5 rounded bg-red-500 text-white font-bold">Your Choice</span>';
+          }
+
+          return `
+            <div class="flex items-center space-x-3 p-3 rounded-2xl border ${border} text-sm">
+              <span class="w-6 h-6 rounded-md bg-slate-100 dark:bg-slate-800 text-xs font-bold flex items-center justify-center">
+                ${letter}
+              </span>
+              <span>${escapeHtml(opt)}</span>
+              ${tag}
+            </div>
+          `;
+        }).join('');
+
+        return `
+          <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-sm space-y-3">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
+              <div class="flex items-center space-x-2">
+                <span class="text-xs font-bold text-slate-400">Q.${index + 1}</span>
+                <span class="text-xs px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-medium">${escapeHtml(item.section)}</span>
+              </div>
+              <div class="flex items-center space-x-2">
+                <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full ${badgeColor}">${statusText}</span>
+                <span class="text-xs font-mono font-bold">${scoreTag}</span>
+              </div>
+            </div>
+
+            <p class="text-base font-medium text-slate-900 dark:text-white leading-relaxed">${escapeHtml(item.questionText)}</p>
+
+            <div class="space-y-2 mt-3">
+              ${optionsHtml}
+            </div>
+
+            ${item.explanation ? `
+              <div class="mt-3 p-3 bg-indigo-50/70 dark:bg-indigo-950/40 border border-brand-200 dark:border-brand-900/60 rounded-2xl text-xs space-y-1">
+                <p class="font-bold text-brand-700 dark:text-brand-300">💡 Answer Explanation:</p>
+                <p class="text-slate-700 dark:text-slate-300 leading-relaxed">${escapeHtml(item.explanation)}</p>
+              </div>
+            ` : ''}
+
+            ${item.studySummary ? `
+              <div class="mt-2 p-3.5 bg-teal-50/70 dark:bg-slate-800/80 border border-teal-200 dark:border-slate-700 rounded-2xl text-xs space-y-1.5">
+                <p class="font-bold text-teal-800 dark:text-teal-300 flex items-center space-x-1">
+                  <span>📚 Study Material & Reference Summary:</span>
+                </p>
+                <p class="text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-line font-normal">${escapeHtml(item.studySummary)}</p>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+    }
+
+    function retakeCurrentTestPrompt() {
+      if (!activeResultAttempt) return;
+      promptModeSelect(activeResultAttempt.mockId);
+    }
+
+    function renderAttemptsHistoryTable() {
+      const tbody = document.getElementById('attemptsHistoryTableBody');
+      if (attempts.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-400 text-xs">No mock test history found.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = attempts.map(att => {
+        return `
+          <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition">
+            <td class="py-3 px-4 font-semibold text-slate-800 dark:text-white">${escapeHtml(att.mockTitle)}</td>
+            <td class="py-3 px-4 text-xs">
+              <span class="px-2 py-0.5 rounded-full font-medium ${att.mode.includes('Practice') ? 'bg-teal-100 text-teal-800 dark:bg-teal-950 dark:text-teal-300' : 'bg-brand-100 text-brand-800 dark:bg-brand-950 dark:text-brand-300'}">
+                ${att.mode}
+              </span>
+            </td>
+            <td class="py-3 px-4 text-xs text-slate-500">${att.date}</td>
+            <td class="py-3 px-4 font-mono font-bold text-brand-600 dark:text-brand-400">${att.score.toFixed(2)} / ${att.maxScore.toFixed(1)}</td>
+            <td class="py-3 px-4">
+              <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold ${att.accuracy >= 70 ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300' : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'}">
+                ${att.accuracy}%
+              </span>
+            </td>
+            <td class="py-3 px-4 text-right">
+              <button onclick="viewPastAttempt('${att.id}')" class="px-3 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-brand-50 hover:text-brand-600 text-xs font-semibold transition">
+                View Summary
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function viewPastAttempt(attemptId) {
+      const found = attempts.find(a => a.id === attemptId);
+      if (found) showResultAnalytics(found);
+    }
+
+    /* -------------------------------------------------------------
+       DUPLICATE, DELETE, IMPORT/EXPORT
+    ------------------------------------------------------------- */
+    function duplicateMock(id) {
+      const target = mocks.find(m => m.id === id);
+      if (!target) return;
+      const clone = JSON.parse(JSON.stringify(target));
+      clone.id = 'mock_' + Date.now();
+      clone.title = `${target.title} (Copy)`;
+      clone.updatedAt = new Date().toISOString();
+      mocks.unshift(clone);
+      saveMocks();
+      renderMockCards();
+      showToast('Mock test duplicated!');
+    }
+
+    function deleteMock(id) {
+      if (!confirmAction('Are you sure you want to delete this mock?')) return;
+      mocks = mocks.filter(m => m.id !== id);
+      saveMocks();
+      renderMockCards();
+      showToast('Mock test removed.');
+    }
+
+    function exportSingleMockJSON(id) {
+      const target = mocks.find(m => m.id === id);
+      if (!target) return;
+      const str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(target, null, 2));
+      const a = document.createElement('a');
+      a.setAttribute("href", str);
+      a.setAttribute("download", `${target.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_mock.json`);
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      showToast('Exported test JSON successfully.');
+    }
+
+    function handleImportJSON(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const imported = JSON.parse(e.target.result);
+          if (!imported.title || !Array.isArray(imported.questions)) {
+            showToast('Invalid JSON schema! Must include title and questions array.', 'error');
+            return;
+          }
+          imported.id = 'mock_' + Date.now();
+          mocks.unshift(imported);
+          saveMocks();
+          renderMockCards();
+          showToast(`Imported: "${imported.title}"`);
+        } catch (err) {
+          showToast('Failed to parse JSON file.', 'error');
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = '';
+    }
+
+    /* -------------------------------------------------------------
+       TOASTS & HELPERS
+    ------------------------------------------------------------- */
+    function showToast(msg, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      
+      let borderClass = 'border-brand-500 bg-slate-900 text-white';
+      if (type === 'error') borderClass = 'border-red-500 bg-red-950 text-red-200';
+      if (type === 'warning') borderClass = 'border-amber-500 bg-amber-950 text-amber-200';
+
+      toast.className = `pointer-events-auto px-4 py-3 rounded-2xl shadow-lg border-l-4 text-xs font-semibold flex items-center space-x-2 transition-all duration-300 transform translate-y-2 opacity-0 ${borderClass}`;
+      toast.innerHTML = `<span>${escapeHtml(msg)}</span>`;
+      container.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      });
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-x-4');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    function confirmAction(msg) {
+      return window.confirm(msg);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+  </script>
+</body>
+</html>
